@@ -1,35 +1,19 @@
-// import { Router } from "express";
-// import { getuser , adduser,updateuser,deleteuser} from "../controllers/user_controller";
-
-// const router = Router();
-
-// router.get("/alluser",getuser);
-// router.post("/adduser",adduser);
-// router.get("/updateuser", updateuser);
-// router.get("/deleteuser",deleteuser);
 
 
-// export default router;
-
-/// middleware validate 
 import { Router } from "express";
-import {
-  getuser , adduser,updateuser,deleteuser}
-
-from "../controllers/user_controller";
-
+import { getuser, adduser, updateuser, deleteuser } from "../controllers/user_controller";
+import { authenticate } from "../middleware/auth.middleware";
+import { isAdmin } from "../middleware/role.middleware";
 import { validate } from "../middleware/validate_middleware";
-import {
-  CreateUserSchema,
-  UpdateUserSchema,
-  DeleteUserSchema,
-} from "../schemas_Zod/index";
+import { CreateUserSchema, UpdateUserSchema } from "../schemas_Zod";
 
 const router = Router();
 
-router.post("/adduser", validate(CreateUserSchema), adduser);
-router.get("/getuser", getuser);
-router.put("/updateuser", validate(UpdateUserSchema), updateuser);
-router.delete("/deleteuser", validate(DeleteUserSchema), deleteuser);
+console.log("✅ user_route loaded"); // 🔥 IMPORTANT
 
-export default router;
+router.get("/", authenticate, isAdmin, getuser);
+router.post("/adduser", authenticate, isAdmin, validate(CreateUserSchema), adduser);
+router.put("/updateuser/:id", authenticate, isAdmin, validate(UpdateUserSchema), updateuser);
+router.delete("/deleteuser/:id", authenticate, isAdmin, deleteuser);
+
+export default router; // 🔥 MUST
